@@ -11,20 +11,20 @@ export const MOCK_FLIGHT: Flight = {
 };
 
 export const MOCK_PROMOTIONS: Promotion[] = [
-  { id: 1, title: '20% Off All Fragrances', shop: 'Dufry World', imageUrl: 'https://picsum.photos/seed/promo1/300/200' },
-  { id: 2, title: 'Buy One Get One Free on Chocolates', shop: 'Sweet Delights', imageUrl: 'https://picsum.photos/seed/promo2/300/200' },
-  { id: 3, title: 'Luxury Watches Tax-Free', shop: 'Timeless Treasures', imageUrl: 'https://picsum.photos/seed/promo3/300/200' },
+  { id: 1, title: '20% Off All Fragrances', shop: 'Dufry World', imageUrl: 'https://source.unsplash.com/300x200/?perfume,fragrance' },
+  { id: 2, title: 'Buy One Get One Free on Chocolates', shop: 'Sweet Delights', imageUrl: 'https://source.unsplash.com/300x200/?chocolate,box' },
+  { id: 3, title: 'Luxury Watches Tax-Free', shop: 'Timeless Treasures', imageUrl: 'https://source.unsplash.com/300x200/?luxury,watch' },
 ];
 
 export const MOCK_PRODUCTS = [
-    { name: 'Chanel No. 5 Perfume', category: 'Fragrance', price: 125, imageUrl: 'https://picsum.photos/seed/prod1/400/400' },
-    { name: 'Lindt Swiss Chocolates Box', category: 'Confectionery', price: 25, imageUrl: 'https://picsum.photos/seed/prod2/400/400' },
-    { name: 'Ray-Ban Aviator Sunglasses', category: 'Accessories', price: 150, imageUrl: 'https://picsum.photos/seed/prod3/400/400' },
-    { name: 'Johnnie Walker Blue Label', category: 'Spirits', price: 220, imageUrl: 'https://picsum.photos/seed/prod4/400/400' },
-    { name: 'Apple AirPods Pro', category: 'Electronics', price: 249, imageUrl: 'https://picsum.photos/seed/prod5/400/400' },
-    { name: 'Lego Star Wars Set', category: 'Toys', price: 80, imageUrl: 'https://picsum.photos/seed/prod6/400/400' },
-    { name: 'Estée Lauder Advanced Night Repair', category: 'Skincare', price: 105, imageUrl: 'https://picsum.photos/seed/prod7/400/400' },
-    { name: 'Tag Heuer Carrera Watch', category: 'Watches', price: 4500, imageUrl: 'https://picsum.photos/seed/prod8/400/400' },
+    { name: 'Chanel No. 5 Perfume', category: 'Fragrance', price: 125, imageUrl: 'https://source.unsplash.com/400x400/?chanel,perfume' },
+    { name: 'Lindt Swiss Chocolates Box', category: 'Confectionery', price: 25, imageUrl: 'https://source.unsplash.com/400x400/?lindt,chocolate' },
+    { name: 'Ray-Ban Aviator Sunglasses', category: 'Accessories', price: 150, imageUrl: 'https://source.unsplash.com/400x400/?ray-ban,sunglasses' },
+    { name: 'Johnnie Walker Blue Label', category: 'Spirits', price: 220, imageUrl: 'https://source.unsplash.com/400x400/?johnnie-walker,whiskey' },
+    { name: 'Apple AirPods Pro', category: 'Electronics', price: 249, imageUrl: 'https://source.unsplash.com/400x400/?airpods,pro' },
+    { name: 'Lego Star Wars Set', category: 'Toys', price: 80, imageUrl: 'https://source.unsplash.com/400x400/?lego,star-wars' },
+    { name: 'Estée Lauder Advanced Night Repair', category: 'Skincare', price: 105, imageUrl: 'https://source.unsplash.com/400x400/?estee-lauder,skincare' },
+    { name: 'Tag Heuer Carrera Watch', category: 'Watches', price: 4500, imageUrl: 'https://source.unsplash.com/400x400/?tag-heuer,watch' },
 ];
 
 export const MOCK_CONTACT_EVENTS: ContactEvent[] = [

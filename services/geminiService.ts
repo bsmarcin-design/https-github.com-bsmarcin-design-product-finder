@@ -34,21 +34,21 @@ const productSchema = {
 };
 
 const generateMockRecommendations = (): Product[] => [
-    { name: 'Tom Ford Oud Wood', category: 'Fragrance', imageUrl: 'https://picsum.photos/seed/rec1/400/400', reason: 'A sophisticated scent that matches your interest in fine spirits.' },
-    { name: 'Sony WH-1000XM5 Headphones', category: 'Electronics', imageUrl: 'https://picsum.photos/seed/rec2/400/400', reason: 'Perfect for your travels and interest in technology.' },
-    { name: 'Glenfiddich 18 Year Old', category: 'Spirits', imageUrl: 'https://picsum.photos/seed/rec3/400/400', reason: 'A classic single malt to add to your collection.' },
+    { name: 'Tom Ford Oud Wood', category: 'Fragrance', imageUrl: 'https://source.unsplash.com/400x400/?tom-ford,perfume', reason: 'A sophisticated scent that matches your interest in fine spirits.' },
+    { name: 'Sony WH-1000XM5 Headphones', category: 'Electronics', imageUrl: 'https://source.unsplash.com/400x400/?sony,headphones', reason: 'Perfect for your travels and interest in technology.' },
+    { name: 'Glenfiddich 18 Year Old', category: 'Spirits', imageUrl: 'https://source.unsplash.com/400x400/?glenfiddich,whiskey', reason: 'A classic single malt to add to your collection.' },
 ];
 
 const generateMockGiftSuggestions = (friend: Friend): Product[] => {
     if (friend.name === 'David') {
         return [
-            { name: 'Anker Power Bank', category: 'Electronics', imageUrl: 'https://picsum.photos/seed/gift1/400/400', reason: 'A practical tech gadget for his collection.' },
-            { name: 'Lagavulin 16 Year Old', category: 'Spirits', imageUrl: 'https://picsum.photos/seed/gift2/400/400', reason: 'A smoky whiskey for a true connoisseur.' },
+            { name: 'Anker Power Bank', category: 'Electronics', imageUrl: 'https://source.unsplash.com/400x400/?anker,power-bank', reason: 'A practical tech gadget for his collection.' },
+            { name: 'Lagavulin 16 Year Old', category: 'Spirits', imageUrl: 'https://source.unsplash.com/400x400/?lagavulin,whiskey', reason: 'A smoky whiskey for a true connoisseur.' },
         ];
     }
     return [
-        { name: 'La Mer Moisturizing Cream', category: 'Skincare', imageUrl: 'https://picsum.photos/seed/gift3/400/400', reason: 'A luxury skincare item she will love.' },
-        { name: 'Godiva Chocolate Assortment', category: 'Confectionery', imageUrl: 'https://picsum.photos/seed/gift4/400/400', reason: 'Artisan chocolates that align with her interests.' },
+        { name: 'La Mer Moisturizing Cream', category: 'Skincare', imageUrl: 'https://source.unsplash.com/400x400/?la-mer,skincare', reason: 'A luxury skincare item she will love.' },
+        { name: 'Godiva Chocolate Assortment', category: 'Confectionery', imageUrl: 'https://source.unsplash.com/400x400/?godiva,chocolate', reason: 'Artisan chocolates that align with her interests.' },
     ];
 };
 
@@ -71,7 +71,7 @@ export const getPersonalizedRecommendations = async (): Promise<Product[]> => {
         throw new Error("Empty response from API");
     }
     const recommendations = JSON.parse(responseText);
-    return recommendations.map((rec: any) => ({ ...rec, imageUrl: `https://picsum.photos/seed/${rec.name.replace(/\s/g, '')}/400/400` }));
+    return recommendations.map((rec: any) => ({ ...rec, imageUrl: `https://source.unsplash.com/400x400/?${rec.name.replace(/\s/g, ',')},${rec.category}` }));
 
   } catch (error) {
     console.error("Error fetching personalized recommendations:", error);
@@ -98,7 +98,7 @@ export const getGiftSuggestions = async (friend: Friend): Promise<Product[]> => 
             throw new Error("Empty response from API");
         }
         const suggestions = JSON.parse(responseText);
-        return suggestions.map((rec: any) => ({ ...rec, imageUrl: `https://picsum.photos/seed/${rec.name.replace(/\s/g, '')}/400/400` }));
+        return suggestions.map((rec: any) => ({ ...rec, imageUrl: `https://source.unsplash.com/400x400/?${rec.name.replace(/\s/g, ',')},${rec.category}` }));
     } catch (error) {
         console.error("Error fetching gift suggestions:", error);
         return generateMockGiftSuggestions(friend);
@@ -124,7 +124,7 @@ export const getEventGiftSuggestions = async (event: {name: string, type: string
             throw new Error("Empty response from API");
         }
         const suggestions = JSON.parse(responseText);
-        return suggestions.map((rec: any) => ({ ...rec, imageUrl: `https://picsum.photos/seed/${rec.name.replace(/\s/g, '')}/400/400` }));
+        return suggestions.map((rec: any) => ({ ...rec, imageUrl: `https://source.unsplash.com/400x400/?${rec.name.replace(/\s/g, ',')},${rec.category}` }));
     } catch (error) {
         console.error("Error fetching event gift suggestions:", error);
         return generateMockRecommendations().slice(0, 2);
