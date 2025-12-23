@@ -33,7 +33,7 @@ const productSchema = {
   },
 };
 
-const generateProductImage = async (productName: string, category: string): Promise<string> => {
+export const generateProductImage = async (productName: string, category: string): Promise<string> => {
     if (!ai) {
         return `https://placehold.co/400x400/1F2937/FFFFFF?text=${encodeURIComponent(productName)}`;
     }
@@ -54,15 +54,6 @@ const generateProductImage = async (productName: string, category: string): Prom
         console.error(`Error generating image for "${productName}":`, error);
         return `https://placehold.co/400x400/9333EA/FFFFFF?text=Image+Error`;
     }
-};
-
-const processProductsWithImages = async (products: Omit<Product, 'imageUrl'>[]): Promise<Product[]> => {
-    return Promise.all(
-        products.map(async (product) => {
-            const imageUrl = await generateProductImage(product.name, product.category);
-            return { ...product, imageUrl };
-        })
-    );
 };
 
 const generateMockRecommendations = (): Product[] => [
@@ -103,7 +94,7 @@ export const getPersonalizedRecommendations = async (): Promise<Product[]> => {
         throw new Error("Empty response from API");
     }
     const recommendations = JSON.parse(responseText);
-    return processProductsWithImages(recommendations);
+    return recommendations;
 
   } catch (error) {
     console.error("Error fetching personalized recommendations:", error);
@@ -130,7 +121,7 @@ export const getGiftSuggestions = async (friend: Friend): Promise<Product[]> => 
             throw new Error("Empty response from API");
         }
         const suggestions = JSON.parse(responseText);
-        return processProductsWithImages(suggestions);
+        return suggestions;
     } catch (error) {
         console.error("Error fetching gift suggestions:", error);
         return generateMockGiftSuggestions(friend);
@@ -156,7 +147,7 @@ export const getEventGiftSuggestions = async (event: {name: string, type: string
             throw new Error("Empty response from API");
         }
         const suggestions = JSON.parse(responseText);
-        return processProductsWithImages(suggestions);
+        return suggestions;
     } catch (error) {
         console.error("Error fetching event gift suggestions:", error);
         return generateMockRecommendations().slice(0, 2);

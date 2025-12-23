@@ -10,7 +10,13 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, onReserve }) => {
   return (
     <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg flex flex-col">
-      <img src={product.imageUrl} alt={product.name} className="w-full h-40 object-cover" />
+      <div className="w-full h-40 bg-gray-700">
+        {product.imageUrl ? (
+          <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full bg-gray-700 animate-pulse" />
+        )}
+      </div>
       <div className="p-4 flex flex-col flex-grow">
         <h3 className="font-bold text-white text-md flex-grow">{product.name}</h3>
         <p className="text-sm text-gray-400 mb-2">{product.category}</p>

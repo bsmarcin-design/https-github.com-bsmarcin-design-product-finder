@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ContactEvent, Product } from '../types';
-import { getEventGiftSuggestions } from '../services/geminiService';
+import { getEventGiftSuggestions, generateProductImage } from '../services/geminiService';
 
 interface EventRemindersProps {
   events: ContactEvent[];
@@ -20,8 +20,27 @@ const EventGiftSuggestions: React.FC<{ event: ContactEvent, onReserve: (product:
             setLoading(false);
         };
         fetchSuggestions();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [event.name, event.type]);
+
+    useEffect(() => {
+        if (!loading && suggestions.length > 0) {
+            suggestions.forEach((product, index) => {
+                if (!product.imageUrl) {
+                    generateProductImage(product.name, product.category).then(imageUrl => {
+                        setSuggestions(prev => {
+                            const newSuggestions = [...prev];
+                            if (newSuggestions[index]) {
+                                newSuggestions[index] = { ...newSuggestions[index], imageUrl };
+                            }
+                            return newSuggestions;
+                        });
+                    });
+                }
+            });
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [loading]);
 
     if (loading) {
         return <div className="text-sm text-gray-400 italic mt-2">Finding perfect gifts...</div>;

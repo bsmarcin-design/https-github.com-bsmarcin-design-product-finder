@@ -19,7 +19,7 @@ export interface Product {
   name: string;
   category: string;
   price?: number;
-  imageUrl: string;
+  imageUrl?: string;
   reason?: string;
 }
 

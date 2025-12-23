@@ -1,18 +1,17 @@
 
 import React, { useEffect, useState } from 'react';
-import { getPersonalizedRecommendations } from '../services/geminiService';
+import { getPersonalizedRecommendations, generateProductImage } from '../services/geminiService';
 import { Product } from '../types';
-import ProductCard from './ProductCard';
 
 const RecommendationsSkeleton: React.FC = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
-            <div key={i} className="bg-gray-800 rounded-lg overflow-hidden shadow-lg animate-pulse">
-                <div className="w-full h-40 bg-gray-700"></div>
-                <div className="p-4">
+            <div key={i} className="bg-gray-800 rounded-lg overflow-hidden shadow-lg flex animate-pulse">
+                <div className="w-1/3 bg-gray-700"></div>
+                <div className="p-4 flex-grow">
                     <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
                     <div className="h-3 bg-gray-700 rounded w-1/2 mb-4"></div>
-                    <div className="h-10 bg-gray-700 rounded w-1/3 ml-auto"></div>
+                    <div className="h-10 bg-gray-700 rounded w-1/3 ml-auto mt-4"></div>
                 </div>
             </div>
         ))}
@@ -39,6 +38,25 @@ const Recommendations: React.FC<RecommendationsProps> = ({ onReserve }) => {
     fetchRecommendations();
   }, []);
 
+  useEffect(() => {
+    if (!loading && recommendations.length > 0) {
+      recommendations.forEach((product, index) => {
+        if (!product.imageUrl) {
+          generateProductImage(product.name, product.category).then(imageUrl => {
+            setRecommendations(prev => {
+              const newRecs = [...prev];
+              if (newRecs[index]) {
+                newRecs[index] = { ...newRecs[index], imageUrl };
+              }
+              return newRecs;
+            });
+          });
+        }
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
+
   return (
     <section>
       <h2 className="text-xl font-bold text-white mb-4">Just for You</h2>
@@ -48,7 +66,13 @@ const Recommendations: React.FC<RecommendationsProps> = ({ onReserve }) => {
         <div className="grid grid-cols-1 gap-4">
             {recommendations.map((product) => (
                 <div key={product.name} className="bg-gray-800 rounded-lg overflow-hidden shadow-lg flex">
-                    <img src={product.imageUrl} alt={product.name} className="w-1/3 h-auto object-cover" />
+                    <div className="w-1/3 h-auto bg-gray-700">
+                        {product.imageUrl ? (
+                           <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                        ) : (
+                            <div className="w-full h-full animate-pulse bg-gray-700" />
+                        )}
+                    </div>
                     <div className="p-4 flex flex-col flex-grow">
                         <h3 className="font-bold text-white text-md flex-grow">{product.name}</h3>
                         <p className="text-sm text-gray-400 mb-2">{product.category}</p>
