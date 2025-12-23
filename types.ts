@@ -1,9 +1,12 @@
 
 export interface Flight {
   flightNumber: string;
+  origin: string;
+  originCode: string;
   destination: string;
   destinationCode: string;
   departureTime: string;
+  boardingTime: string;
   gate: string;
   status: 'On Time' | 'Delayed' | 'Boarding';
 }
@@ -12,7 +15,8 @@ export interface Promotion {
   id: number;
   title: string;
   shop: string;
-  imageUrl: string;
+  category?: string;
+  imageUrl?: string;
 }
 
 export interface Product {

@@ -11,8 +11,9 @@ import ProductCatalogue from './components/ProductCatalogue';
 import { ReservationModal } from './components/ReservationModal';
 import ApiKeySelector from './components/ApiKeySelector';
 import { ApiKeyContext } from './contexts/ApiKeyProvider';
-import { Product } from './types';
-import { MOCK_FLIGHT, MOCK_PROMOTIONS, MOCK_CONTACT_EVENTS, MOCK_FRIENDS } from './constants';
+import { Product, Flight } from './types';
+import { MOCK_FLIGHT, MOCK_CONTACT_EVENTS, MOCK_FRIENDS } from './constants';
+import { getDynamicFlightInfo } from './services/geminiService';
 
 type View = 'home' | 'catalogue' | 'gifts' | 'profile';
 
@@ -29,6 +30,9 @@ const App: React.FC = () => {
   const [isKeyReady, setIsKeyReady] = useState(false);
   const [isCheckingKey, setIsCheckingKey] = useState(true);
 
+  const [flight, setFlight] = useState<Flight>(MOCK_FLIGHT);
+  const [isFlightLoading, setIsFlightLoading] = useState(true);
+
   const checkKey = async () => {
     try {
         if (window.aistudio && await window.aistudio.hasSelectedApiKey()) {
@@ -44,6 +48,47 @@ const App: React.FC = () => {
   useEffect(() => {
     checkKey();
   }, []);
+
+  useEffect(() => {
+    const loadFlightData = () => {
+        if (!navigator.geolocation) {
+            console.warn("Geolocation is not supported by this browser.");
+            setIsFlightLoading(false);
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+                try {
+                    const dynamicFlight = await getDynamicFlightInfo(latitude, longitude);
+                    if (dynamicFlight) {
+                        setFlight(dynamicFlight);
+                    }
+                } catch (error) {
+                    console.error("Failed to get dynamic flight info, using mock data.", error);
+                    if (error instanceof Error && error.message === 'API_KEY_INVALID') {
+                        handleApiKeyError();
+                    }
+                } finally {
+                    setIsFlightLoading(false);
+                }
+            },
+            (error) => {
+                console.warn(`Geolocation error: ${error.message}. Using mock data.`);
+                setIsFlightLoading(false);
+            }
+        );
+    };
+
+    if (isKeyReady) {
+        loadFlightData();
+    } else if (!isCheckingKey) {
+        // If key is not ready and we're done checking, use mock data.
+        setIsFlightLoading(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isKeyReady, isCheckingKey]);
 
   const handleSelectKey = async () => {
     try {
@@ -75,8 +120,8 @@ const App: React.FC = () => {
       case 'home':
         return (
           <div className="space-y-8">
-            <FlightInfoCard flight={MOCK_FLIGHT} />
-            <PromotionsCarousel promotions={MOCK_PROMOTIONS} />
+            <FlightInfoCard flight={flight} isLoading={isFlightLoading} />
+            <PromotionsCarousel />
             <Recommendations onReserve={handleReserveClick} />
           </div>
         );

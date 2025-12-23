@@ -3,17 +3,20 @@ import { Flight, Promotion, ContactEvent, Friend } from './types';
 
 export const MOCK_FLIGHT: Flight = {
   flightNumber: 'AV725',
+  origin: 'London',
+  originCode: 'LHR',
   destination: 'Paris',
   destinationCode: 'CDG',
   departureTime: '18:45',
+  boardingTime: '18:00',
   gate: 'B28',
   status: 'On Time',
 };
 
 export const MOCK_PROMOTIONS: Promotion[] = [
-  { id: 1, title: '20% Off All Fragrances', shop: 'Dufry World', imageUrl: 'https://placehold.co/300x200/9333EA/FFFFFF?text=Fragrance+Sale' },
-  { id: 2, title: 'Buy One Get One Free on Chocolates', shop: 'Sweet Delights', imageUrl: 'https://placehold.co/300x200/9333EA/FFFFFF?text=Chocolate+Deal' },
-  { id: 3, title: 'Luxury Watches Tax-Free', shop: 'Timeless Treasures', imageUrl: 'https://placehold.co/300x200/9333EA/FFFFFF?text=Watches' },
+  { id: 1, title: '20% Off All Fragrances', shop: 'Dufry World', category: 'Beauty' },
+  { id: 2, title: 'Buy One Get One Free on Chocolates', shop: 'Sweet Delights', category: 'Food & Drink' },
+  { id: 3, title: 'Luxury Watches Tax-Free', shop: 'Timeless Treasures', category: 'Luxury' },
 ];
 
 export const MOCK_PRODUCTS = [

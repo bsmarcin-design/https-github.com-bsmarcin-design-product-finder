@@ -1,5 +1,7 @@
 {
   "name": "Avolta Product Finder",
   "description": "A loyalty program app for airport shops, providing flight information, personalized promotions, product recommendations, and gift suggestions to enhance the airport shopping experience.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "geolocation"
+  ]
 }

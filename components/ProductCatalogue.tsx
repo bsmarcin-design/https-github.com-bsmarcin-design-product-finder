@@ -11,14 +11,16 @@ interface ProductCatalogueProps {
 }
 
 const ProductCatalogue: React.FC<ProductCatalogueProps> = ({ onReserve }) => {
-  const [products, setProducts] = useState<Product[]>(MOCK_PRODUCTS);
+  const [products, setProducts] = useState<Product[]>(MOCK_PRODUCTS.map(p => ({...p})));
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const { reportApiKeyError } = useContext(ApiKeyContext);
 
   useEffect(() => {
-    // On mount, iterate through the static mock products and generate an image for each one.
-    MOCK_PRODUCTS.forEach((p, index) => {
+    // On mount, iterate through the products and generate an image for each one that doesn't have it.
+    products.forEach((p, index) => {
+        if (p.imageUrl) return;
+
         generateProductImage(p.name, p.category)
           .then(imageUrl => {
             // Update the state progressively as each image is generated.
@@ -31,14 +33,15 @@ const ProductCatalogue: React.FC<ProductCatalogueProps> = ({ onReserve }) => {
             });
           })
           .catch(error => {
+             console.error(`Error generating image for ${p.name}:`, error);
              if (error instanceof Error && error.message === 'API_KEY_INVALID') {
                reportApiKeyError();
              }
           });
       });
-  // We only want this effect to run once on component mount.
+  // This effect should run once on mount to populate images.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reportApiKeyError]);
+  }, []);
 
   const categories = ['All', ...Array.from(new Set(MOCK_PRODUCTS.map(p => p.category)))];
 
