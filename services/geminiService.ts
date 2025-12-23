@@ -5,11 +5,14 @@ import { USER_PROFILE } from "../constants";
 
 const API_KEY = process.env.API_KEY;
 
+// NOTE: A new GoogleGenAI instance is created before each call in the production flow
+// to ensure it uses the latest key from the selection dialog.
+// This `ai` constant is primarily for the API_KEY check and mock data flow.
+const ai = API_KEY ? new GoogleGenAI({ apiKey: API_KEY }) : null;
+
 if (!API_KEY) {
   console.warn("API_KEY is not set. Using mock data.");
 }
-
-const ai = API_KEY ? new GoogleGenAI({ apiKey: API_KEY }) : null;
 
 const productSchema = {
   type: Type.ARRAY,
@@ -34,13 +37,14 @@ const productSchema = {
 };
 
 export const generateProductImage = async (productName: string, category: string): Promise<string> => {
-    if (!ai) {
+    const localAi = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    if (!process.env.API_KEY) {
         return `https://placehold.co/400x400/1F2937/FFFFFF?text=${encodeURIComponent(productName)}`;
     }
     try {
         const prompt = `A professional, clean product shot of ${productName}, a ${category} item. Centered, on a neutral, minimalist background.`;
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash-image',
+        const response = await localAi.models.generateContent({
+            model: 'gemini-3-pro-image-preview',
             contents: { parts: [{ text: prompt }] },
         });
 
@@ -51,6 +55,9 @@ export const generateProductImage = async (productName: string, category: string
         }
         throw new Error("No image data found in API response.");
     } catch (error) {
+        if (error instanceof Error && error.message.includes("Requested entity was not found.")) {
+             throw new Error("API_KEY_INVALID");
+        }
         console.error(`Error generating image for "${productName}":`, error);
         return `https://placehold.co/400x400/9333EA/FFFFFF?text=Image+Error`;
     }
@@ -76,11 +83,12 @@ const generateMockGiftSuggestions = (friend: Friend): Product[] => {
 };
 
 export const getPersonalizedRecommendations = async (): Promise<Product[]> => {
-  if (!ai) return generateMockRecommendations();
+  const localAi = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  if (!process.env.API_KEY) return generateMockRecommendations();
   try {
     const prompt = `You are a personal shopper for an airport duty-free store called Avolta. A user has the following profile: ${JSON.stringify(USER_PROFILE)}. Based on their profile, recommend 3 products. The product names should be realistic for a duty-free store.`;
 
-    const response = await ai.models.generateContent({
+    const response = await localAi.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: prompt,
         config: {
@@ -97,17 +105,21 @@ export const getPersonalizedRecommendations = async (): Promise<Product[]> => {
     return recommendations;
 
   } catch (error) {
+     if (error instanceof Error && error.message.includes("Requested entity was not found.")) {
+         throw new Error("API_KEY_INVALID");
+    }
     console.error("Error fetching personalized recommendations:", error);
     return generateMockRecommendations();
   }
 };
 
 export const getGiftSuggestions = async (friend: Friend): Promise<Product[]> => {
-    if (!ai) return generateMockGiftSuggestions(friend);
+    const localAi = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    if (!process.env.API_KEY) return generateMockGiftSuggestions(friend);
     try {
         const prompt = `You are a gift-giving expert for an airport duty-free store. A user wants to buy a gift for their ${friend.relation}, ${friend.name}, who is a ${friend.age}-year-old ${friend.gender} interested in ${friend.interests.join(', ')}. The user's own shopping history includes ${USER_PROFILE.shoppingHistory.join(', ')}. Suggest 2 gift ideas. Product names should be realistic for a duty-free store.`;
 
-        const response = await ai.models.generateContent({
+        const response = await localAi.models.generateContent({
             model: "gemini-3-flash-preview",
             contents: prompt,
             config: {
@@ -123,17 +135,21 @@ export const getGiftSuggestions = async (friend: Friend): Promise<Product[]> => 
         const suggestions = JSON.parse(responseText);
         return suggestions;
     } catch (error) {
+        if (error instanceof Error && error.message.includes("Requested entity was not found.")) {
+             throw new Error("API_KEY_INVALID");
+        }
         console.error("Error fetching gift suggestions:", error);
         return generateMockGiftSuggestions(friend);
     }
 };
 
 export const getEventGiftSuggestions = async (event: {name: string, type: string}): Promise<Product[]> => {
-    if (!ai) return generateMockRecommendations().slice(0, 2); // Return some mock data
+    const localAi = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    if (!process.env.API_KEY) return generateMockRecommendations().slice(0, 2);
     try {
         const prompt = `You are a gift-giving expert for an airport duty-free store. A user needs a gift for ${event.name}'s upcoming ${event.type}. Suggest 2 thoughtful gift ideas available at a duty-free shop.`;
 
-        const response = await ai.models.generateContent({
+        const response = await localAi.models.generateContent({
             model: "gemini-3-flash-preview",
             contents: prompt,
             config: {
@@ -149,6 +165,9 @@ export const getEventGiftSuggestions = async (event: {name: string, type: string
         const suggestions = JSON.parse(responseText);
         return suggestions;
     } catch (error) {
+        if (error instanceof Error && error.message.includes("Requested entity was not found.")) {
+             throw new Error("API_KEY_INVALID");
+        }
         console.error("Error fetching event gift suggestions:", error);
         return generateMockRecommendations().slice(0, 2);
     }

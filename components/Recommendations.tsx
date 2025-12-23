@@ -1,7 +1,8 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { getPersonalizedRecommendations, generateProductImage } from '../services/geminiService';
 import { Product } from '../types';
+import { ApiKeyContext } from '../contexts/ApiKeyProvider';
 
 const RecommendationsSkeleton: React.FC = () => (
     <div className="space-y-4">
@@ -26,36 +27,49 @@ interface RecommendationsProps {
 const Recommendations: React.FC<RecommendationsProps> = ({ onReserve }) => {
   const [recommendations, setRecommendations] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const { reportApiKeyError } = useContext(ApiKeyContext);
 
   useEffect(() => {
     const fetchRecommendations = async () => {
       setLoading(true);
-      const data = await getPersonalizedRecommendations();
-      setRecommendations(data);
-      setLoading(false);
+      try {
+        const data = await getPersonalizedRecommendations();
+        setRecommendations(data);
+      } catch (error) {
+        if (error instanceof Error && error.message === 'API_KEY_INVALID') {
+            reportApiKeyError();
+        }
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchRecommendations();
-  }, []);
+  }, [reportApiKeyError]);
 
   useEffect(() => {
     if (!loading && recommendations.length > 0) {
       recommendations.forEach((product, index) => {
         if (!product.imageUrl) {
-          generateProductImage(product.name, product.category).then(imageUrl => {
-            setRecommendations(prev => {
-              const newRecs = [...prev];
-              if (newRecs[index]) {
-                newRecs[index] = { ...newRecs[index], imageUrl };
-              }
-              return newRecs;
+          generateProductImage(product.name, product.category)
+            .then(imageUrl => {
+                setRecommendations(prev => {
+                const newRecs = [...prev];
+                if (newRecs[index]) {
+                    newRecs[index] = { ...newRecs[index], imageUrl };
+                }
+                return newRecs;
+                });
+            })
+            .catch(error => {
+                if (error instanceof Error && error.message === 'API_KEY_INVALID') {
+                    reportApiKeyError();
+                }
             });
-          });
         }
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading]);
+  }, [loading, recommendations, reportApiKeyError]);
 
   return (
     <section>

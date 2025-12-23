@@ -1,8 +1,9 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { getGiftSuggestions, generateProductImage } from '../services/geminiService';
 import { Friend, Product } from '../types';
 import ProductCard from './ProductCard';
+import { ApiKeyContext } from '../contexts/ApiKeyProvider';
 
 const SuggestionSkeleton: React.FC = () => (
     <div className="grid grid-cols-2 gap-4">
@@ -21,35 +22,48 @@ const SuggestionSkeleton: React.FC = () => (
 const FriendGiftSection: React.FC<{ friend: Friend; onReserve: (product: Product) => void; }> = ({ friend, onReserve }) => {
     const [suggestions, setSuggestions] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const { reportApiKeyError } = useContext(ApiKeyContext);
 
     useEffect(() => {
         const fetchSuggestions = async () => {
             setLoading(true);
-            const data = await getGiftSuggestions(friend);
-            setSuggestions(data);
-            setLoading(false);
+            try {
+                const data = await getGiftSuggestions(friend);
+                setSuggestions(data);
+            } catch (error) {
+                if (error instanceof Error && error.message === 'API_KEY_INVALID') {
+                    reportApiKeyError();
+                }
+            } finally {
+                setLoading(false);
+            }
         };
         fetchSuggestions();
-    }, [friend]);
+    }, [friend, reportApiKeyError]);
 
     useEffect(() => {
         if (!loading && suggestions.length > 0) {
             suggestions.forEach((product, index) => {
                 if (!product.imageUrl) {
-                    generateProductImage(product.name, product.category).then(imageUrl => {
-                        setSuggestions(prev => {
-                            const newSuggestions = [...prev];
-                            if (newSuggestions[index]) {
-                                newSuggestions[index] = { ...newSuggestions[index], imageUrl };
+                    generateProductImage(product.name, product.category)
+                        .then(imageUrl => {
+                            setSuggestions(prev => {
+                                const newSuggestions = [...prev];
+                                if (newSuggestions[index]) {
+                                    newSuggestions[index] = { ...newSuggestions[index], imageUrl };
+                                }
+                                return newSuggestions;
+                            });
+                        })
+                        .catch(error => {
+                            if (error instanceof Error && error.message === 'API_KEY_INVALID') {
+                                reportApiKeyError();
                             }
-                            return newSuggestions;
                         });
-                    });
                 }
             });
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loading]);
+    }, [loading, suggestions, reportApiKeyError]);
 
     return (
         <div>

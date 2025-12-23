@@ -1,7 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { ContactEvent, Product } from '../types';
 import { getEventGiftSuggestions, generateProductImage } from '../services/geminiService';
+import { ApiKeyContext } from '../contexts/ApiKeyProvider';
 
 interface EventRemindersProps {
   events: ContactEvent[];
@@ -11,36 +12,48 @@ interface EventRemindersProps {
 const EventGiftSuggestions: React.FC<{ event: ContactEvent, onReserve: (product: Product) => void }> = ({ event, onReserve }) => {
     const [suggestions, setSuggestions] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const { reportApiKeyError } = useContext(ApiKeyContext);
 
     useEffect(() => {
         const fetchSuggestions = async () => {
             setLoading(true);
-            const data = await getEventGiftSuggestions({ name: event.name, type: event.type });
-            setSuggestions(data);
-            setLoading(false);
+            try {
+                const data = await getEventGiftSuggestions({ name: event.name, type: event.type });
+                setSuggestions(data);
+            } catch (error) {
+                if (error instanceof Error && error.message === 'API_KEY_INVALID') {
+                    reportApiKeyError();
+                }
+            } finally {
+                setLoading(false);
+            }
         };
         fetchSuggestions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [event.name, event.type]);
+    }, [event.name, event.type, reportApiKeyError]);
 
     useEffect(() => {
         if (!loading && suggestions.length > 0) {
             suggestions.forEach((product, index) => {
                 if (!product.imageUrl) {
-                    generateProductImage(product.name, product.category).then(imageUrl => {
-                        setSuggestions(prev => {
-                            const newSuggestions = [...prev];
-                            if (newSuggestions[index]) {
-                                newSuggestions[index] = { ...newSuggestions[index], imageUrl };
+                    generateProductImage(product.name, product.category)
+                        .then(imageUrl => {
+                            setSuggestions(prev => {
+                                const newSuggestions = [...prev];
+                                if (newSuggestions[index]) {
+                                    newSuggestions[index] = { ...newSuggestions[index], imageUrl };
+                                }
+                                return newSuggestions;
+                            });
+                        })
+                        .catch(error => {
+                            if (error instanceof Error && error.message === 'API_KEY_INVALID') {
+                                reportApiKeyError();
                             }
-                            return newSuggestions;
                         });
-                    });
                 }
             });
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loading]);
+    }, [loading, suggestions, reportApiKeyError]);
 
     if (loading) {
         return <div className="text-sm text-gray-400 italic mt-2">Finding perfect gifts...</div>;

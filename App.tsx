@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import BottomNav from './components/BottomNav';
 import FlightInfoCard from './components/FlightInfoCard';
@@ -9,15 +9,66 @@ import GiftSuggestions from './components/GiftSuggestions';
 import EventReminders from './components/EventReminders';
 import ProductCatalogue from './components/ProductCatalogue';
 import { ReservationModal } from './components/ReservationModal';
+import ApiKeySelector from './components/ApiKeySelector';
+import { ApiKeyContext } from './contexts/ApiKeyProvider';
 import { Product } from './types';
 import { MOCK_FLIGHT, MOCK_PROMOTIONS, MOCK_CONTACT_EVENTS, MOCK_FRIENDS } from './constants';
 
 type View = 'home' | 'catalogue' | 'gifts' | 'profile';
 
+// FIX: Removed conflicting global declaration for `window.aistudio`.
+// The TypeScript error indicates that this type is already defined globally,
+// so redeclaring it causes a conflict. The global type for `window.aistudio`
+// is expected to be provided by the environment.
+declare global {
+  interface Window {
+    aistudio: any;
+  }
+}
+
 const App: React.FC = () => {
   const [activeView, setActiveView] = useState<View>('home');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const [isKeyReady, setIsKeyReady] = useState(false);
+  const [isCheckingKey, setIsCheckingKey] = useState(true);
+
+  const checkKey = async () => {
+    try {
+        if (window.aistudio && await window.aistudio.hasSelectedApiKey()) {
+            setIsKeyReady(true);
+        }
+    } catch (e) {
+        console.error("Error checking for API key:", e);
+    } finally {
+        setIsCheckingKey(false);
+    }
+  };
+
+  useEffect(() => {
+    checkKey();
+  }, []);
+
+  const handleSelectKey = async () => {
+    try {
+        if (window.aistudio) {
+            await window.aistudio.openSelectKey();
+            // Assume success and proceed to the app, per guidelines
+            setIsKeyReady(true);
+            setIsCheckingKey(false);
+        }
+    } catch (e) {
+        console.error("Error opening key selection:", e);
+        setIsCheckingKey(false); // Stop checking even if it fails
+    }
+  };
+
+  const handleApiKeyError = () => {
+    // This function is called by child components via context if the API key is invalid
+    setIsKeyReady(false);
+    setIsCheckingKey(false);
+  };
 
   const handleReserveClick = (product: Product) => {
     setSelectedProduct(product);
@@ -49,23 +100,41 @@ const App: React.FC = () => {
         return null;
     }
   };
+  
+  const renderApp = () => {
+    if (isCheckingKey) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-white">Checking for API Key...</div>
+            </div>
+        )
+    }
+    if (!isKeyReady) {
+        return <ApiKeySelector onSelectKey={handleSelectKey} />;
+    }
+    return (
+        <ApiKeyContext.Provider value={{ reportApiKeyError: handleApiKeyError }}>
+            <div className="max-w-md mx-auto bg-gray-900 pb-24">
+                <Header />
+                <main className="p-4">
+                {renderContent()}
+                </main>
+            </div>
+            <BottomNav activeView={activeView} setActiveView={setActiveView} />
+            {selectedProduct && (
+                <ReservationModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                product={selectedProduct}
+                />
+            )}
+        </ApiKeyContext.Provider>
+    )
+  }
 
   return (
     <div className="bg-gray-900 min-h-screen font-sans text-white">
-      <div className="max-w-md mx-auto bg-gray-900 pb-24">
-        <Header />
-        <main className="p-4">
-          {renderContent()}
-        </main>
-      </div>
-      <BottomNav activeView={activeView} setActiveView={setActiveView} />
-      {selectedProduct && (
-        <ReservationModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          product={selectedProduct}
-        />
-      )}
+      {renderApp()}
     </div>
   );
 };
