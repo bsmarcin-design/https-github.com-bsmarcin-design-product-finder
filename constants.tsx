@@ -17,14 +17,14 @@ export const MOCK_PROMOTIONS: Promotion[] = [
 ];
 
 export const MOCK_PRODUCTS = [
-    { name: 'Chanel No. 5 Perfume', category: 'Fragrance', price: 125, imageUrl: 'https://placehold.co/400x400/1F2937/FFFFFF?text=Chanel+No.5' },
-    { name: 'Lindt Swiss Chocolates Box', category: 'Confectionery', price: 25, imageUrl: 'https://placehold.co/400x400/1F2937/FFFFFF?text=Lindt+Chocolates' },
-    { name: 'Ray-Ban Aviator Sunglasses', category: 'Accessories', price: 150, imageUrl: 'https://placehold.co/400x400/1F2937/FFFFFF?text=Ray-Ban' },
-    { name: 'Johnnie Walker Blue Label', category: 'Spirits', price: 220, imageUrl: 'https://placehold.co/400x400/1F2937/FFFFFF?text=Johnnie+Walker' },
-    { name: 'Apple AirPods Pro', category: 'Electronics', price: 249, imageUrl: 'https://placehold.co/400x400/1F2937/FFFFFF?text=AirPods+Pro' },
-    { name: 'Lego Star Wars Set', category: 'Toys', price: 80, imageUrl: 'https://placehold.co/400x400/1F2937/FFFFFF?text=Lego+Star+Wars' },
-    { name: 'Estée Lauder Advanced Night Repair', category: 'Skincare', price: 105, imageUrl: 'https://placehold.co/400x400/1F2937/FFFFFF?text=Estée+Lauder' },
-    { name: 'Tag Heuer Carrera Watch', category: 'Watches', price: 4500, imageUrl: 'https://placehold.co/400x400/1F2937/FFFFFF?text=Tag+Heuer' },
+    { name: 'Chanel No. 5 Perfume', category: 'Fragrance', price: 125 },
+    { name: 'Lindt Swiss Chocolates Box', category: 'Confectionery', price: 25 },
+    { name: 'Ray-Ban Aviator Sunglasses', category: 'Accessories', price: 150 },
+    { name: 'Johnnie Walker Blue Label', category: 'Spirits', price: 220 },
+    { name: 'Apple AirPods Pro', category: 'Electronics', price: 249 },
+    { name: 'Lego Star Wars Set', category: 'Toys', price: 80 },
+    { name: 'Estée Lauder Advanced Night Repair', category: 'Skincare', price: 105 },
+    { name: 'Tag Heuer Carrera Watch', category: 'Watches', price: 4500 },
 ];
 
 export const MOCK_CONTACT_EVENTS: ContactEvent[] = [

@@ -20,11 +20,6 @@ type View = 'home' | 'catalogue' | 'gifts' | 'profile';
 // The TypeScript error indicates that this type is already defined globally,
 // so redeclaring it causes a conflict. The global type for `window.aistudio`
 // is expected to be provided by the environment.
-declare global {
-  interface Window {
-    aistudio: any;
-  }
-}
 
 const App: React.FC = () => {
   const [activeView, setActiveView] = useState<View>('home');

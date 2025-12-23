@@ -1,20 +1,48 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Product } from '../types';
 import { MOCK_PRODUCTS } from '../constants';
 import ProductCard from './ProductCard';
+import { generateProductImage } from '../services/geminiService';
+import { ApiKeyContext } from '../contexts/ApiKeyProvider';
 
 interface ProductCatalogueProps {
     onReserve: (product: Product) => void;
 }
 
 const ProductCatalogue: React.FC<ProductCatalogueProps> = ({ onReserve }) => {
+  const [products, setProducts] = useState<Product[]>(MOCK_PRODUCTS);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const { reportApiKeyError } = useContext(ApiKeyContext);
+
+  useEffect(() => {
+    // On mount, iterate through the static mock products and generate an image for each one.
+    MOCK_PRODUCTS.forEach((p, index) => {
+        generateProductImage(p.name, p.category)
+          .then(imageUrl => {
+            // Update the state progressively as each image is generated.
+            setProducts(currentProducts => {
+              const newProducts = [...currentProducts];
+              if (newProducts[index]) {
+                  newProducts[index].imageUrl = imageUrl;
+              }
+              return newProducts;
+            });
+          })
+          .catch(error => {
+             if (error instanceof Error && error.message === 'API_KEY_INVALID') {
+               reportApiKeyError();
+             }
+          });
+      });
+  // We only want this effect to run once on component mount.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reportApiKeyError]);
 
   const categories = ['All', ...Array.from(new Set(MOCK_PRODUCTS.map(p => p.category)))];
 
-  const filteredProducts = MOCK_PRODUCTS.filter(product => {
+  const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
