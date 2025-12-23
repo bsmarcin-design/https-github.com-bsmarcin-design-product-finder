@@ -33,22 +33,54 @@ const productSchema = {
   },
 };
 
+const generateProductImage = async (productName: string, category: string): Promise<string> => {
+    if (!ai) {
+        return `https://placehold.co/400x400/1F2937/FFFFFF?text=${encodeURIComponent(productName)}`;
+    }
+    try {
+        const prompt = `A professional, clean product shot of ${productName}, a ${category} item. Centered, on a neutral, minimalist background.`;
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash-image',
+            contents: { parts: [{ text: prompt }] },
+        });
+
+        for (const part of response.candidates[0].content.parts) {
+            if (part.inlineData) {
+                return `data:image/png;base64,${part.inlineData.data}`;
+            }
+        }
+        throw new Error("No image data found in API response.");
+    } catch (error) {
+        console.error(`Error generating image for "${productName}":`, error);
+        return `https://placehold.co/400x400/9333EA/FFFFFF?text=Image+Error`;
+    }
+};
+
+const processProductsWithImages = async (products: Omit<Product, 'imageUrl'>[]): Promise<Product[]> => {
+    return Promise.all(
+        products.map(async (product) => {
+            const imageUrl = await generateProductImage(product.name, product.category);
+            return { ...product, imageUrl };
+        })
+    );
+};
+
 const generateMockRecommendations = (): Product[] => [
-    { name: 'Tom Ford Oud Wood', category: 'Fragrance', imageUrl: 'https://source.unsplash.com/400x400/?tom-ford,perfume', reason: 'A sophisticated scent that matches your interest in fine spirits.' },
-    { name: 'Sony WH-1000XM5 Headphones', category: 'Electronics', imageUrl: 'https://source.unsplash.com/400x400/?sony,headphones', reason: 'Perfect for your travels and interest in technology.' },
-    { name: 'Glenfiddich 18 Year Old', category: 'Spirits', imageUrl: 'https://source.unsplash.com/400x400/?glenfiddich,whiskey', reason: 'A classic single malt to add to your collection.' },
+    { name: 'Tom Ford Oud Wood', category: 'Fragrance', imageUrl: `https://placehold.co/400x400/1F2937/FFFFFF?text=Oud+Wood`, reason: 'A sophisticated scent that matches your interest in fine spirits.' },
+    { name: 'Sony WH-1000XM5 Headphones', category: 'Electronics', imageUrl: `https://placehold.co/400x400/1F2937/FFFFFF?text=Headphones`, reason: 'Perfect for your travels and interest in technology.' },
+    { name: 'Glenfiddich 18 Year Old', category: 'Spirits', imageUrl: `https://placehold.co/400x400/1F2937/FFFFFF?text=Whiskey`, reason: 'A classic single malt to add to your collection.' },
 ];
 
 const generateMockGiftSuggestions = (friend: Friend): Product[] => {
     if (friend.name === 'David') {
         return [
-            { name: 'Anker Power Bank', category: 'Electronics', imageUrl: 'https://source.unsplash.com/400x400/?anker,power-bank', reason: 'A practical tech gadget for his collection.' },
-            { name: 'Lagavulin 16 Year Old', category: 'Spirits', imageUrl: 'https://source.unsplash.com/400x400/?lagavulin,whiskey', reason: 'A smoky whiskey for a true connoisseur.' },
+            { name: 'Anker Power Bank', category: 'Electronics', imageUrl: `https://placehold.co/400x400/1F2937/FFFFFF?text=Power+Bank`, reason: 'A practical tech gadget for his collection.' },
+            { name: 'Lagavulin 16 Year Old', category: 'Spirits', imageUrl: `https://placehold.co/400x400/1F2937/FFFFFF?text=Lagavulin`, reason: 'A smoky whiskey for a true connoisseur.' },
         ];
     }
     return [
-        { name: 'La Mer Moisturizing Cream', category: 'Skincare', imageUrl: 'https://source.unsplash.com/400x400/?la-mer,skincare', reason: 'A luxury skincare item she will love.' },
-        { name: 'Godiva Chocolate Assortment', category: 'Confectionery', imageUrl: 'https://source.unsplash.com/400x400/?godiva,chocolate', reason: 'Artisan chocolates that align with her interests.' },
+        { name: 'La Mer Moisturizing Cream', category: 'Skincare', imageUrl: `https://placehold.co/400x400/1F2937/FFFFFF?text=La+Mer`, reason: 'A luxury skincare item she will love.' },
+        { name: 'Godiva Chocolate Assortment', category: 'Confectionery', imageUrl: `https://placehold.co/400x400/1F2937/FFFFFF?text=Godiva`, reason: 'Artisan chocolates that align with her interests.' },
     ];
 };
 
@@ -71,7 +103,7 @@ export const getPersonalizedRecommendations = async (): Promise<Product[]> => {
         throw new Error("Empty response from API");
     }
     const recommendations = JSON.parse(responseText);
-    return recommendations.map((rec: any) => ({ ...rec, imageUrl: `https://source.unsplash.com/400x400/?${rec.name.replace(/\s/g, ',')},${rec.category}` }));
+    return processProductsWithImages(recommendations);
 
   } catch (error) {
     console.error("Error fetching personalized recommendations:", error);
@@ -98,7 +130,7 @@ export const getGiftSuggestions = async (friend: Friend): Promise<Product[]> => 
             throw new Error("Empty response from API");
         }
         const suggestions = JSON.parse(responseText);
-        return suggestions.map((rec: any) => ({ ...rec, imageUrl: `https://source.unsplash.com/400x400/?${rec.name.replace(/\s/g, ',')},${rec.category}` }));
+        return processProductsWithImages(suggestions);
     } catch (error) {
         console.error("Error fetching gift suggestions:", error);
         return generateMockGiftSuggestions(friend);
@@ -124,7 +156,7 @@ export const getEventGiftSuggestions = async (event: {name: string, type: string
             throw new Error("Empty response from API");
         }
         const suggestions = JSON.parse(responseText);
-        return suggestions.map((rec: any) => ({ ...rec, imageUrl: `https://source.unsplash.com/400x400/?${rec.name.replace(/\s/g, ',')},${rec.category}` }));
+        return processProductsWithImages(suggestions);
     } catch (error) {
         console.error("Error fetching event gift suggestions:", error);
         return generateMockRecommendations().slice(0, 2);

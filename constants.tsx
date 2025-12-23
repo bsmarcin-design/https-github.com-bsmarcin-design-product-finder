@@ -11,20 +11,20 @@ export const MOCK_FLIGHT: Flight = {
 };
 
 export const MOCK_PROMOTIONS: Promotion[] = [
-  { id: 1, title: '20% Off All Fragrances', shop: 'Dufry World', imageUrl: 'https://source.unsplash.com/300x200/?perfume,fragrance' },
-  { id: 2, title: 'Buy One Get One Free on Chocolates', shop: 'Sweet Delights', imageUrl: 'https://source.unsplash.com/300x200/?chocolate,box' },
-  { id: 3, title: 'Luxury Watches Tax-Free', shop: 'Timeless Treasures', imageUrl: 'https://source.unsplash.com/300x200/?luxury,watch' },
+  { id: 1, title: '20% Off All Fragrances', shop: 'Dufry World', imageUrl: 'https://placehold.co/300x200/9333EA/FFFFFF?text=Fragrance+Sale' },
+  { id: 2, title: 'Buy One Get One Free on Chocolates', shop: 'Sweet Delights', imageUrl: 'https://placehold.co/300x200/9333EA/FFFFFF?text=Chocolate+Deal' },
+  { id: 3, title: 'Luxury Watches Tax-Free', shop: 'Timeless Treasures', imageUrl: 'https://placehold.co/300x200/9333EA/FFFFFF?text=Watches' },
 ];
 
 export const MOCK_PRODUCTS = [
-    { name: 'Chanel No. 5 Perfume', category: 'Fragrance', price: 125, imageUrl: 'https://source.unsplash.com/400x400/?chanel,perfume' },
-    { name: 'Lindt Swiss Chocolates Box', category: 'Confectionery', price: 25, imageUrl: 'https://source.unsplash.com/400x400/?lindt,chocolate' },
-    { name: 'Ray-Ban Aviator Sunglasses', category: 'Accessories', price: 150, imageUrl: 'https://source.unsplash.com/400x400/?ray-ban,sunglasses' },
-    { name: 'Johnnie Walker Blue Label', category: 'Spirits', price: 220, imageUrl: 'https://source.unsplash.com/400x400/?johnnie-walker,whiskey' },
-    { name: 'Apple AirPods Pro', category: 'Electronics', price: 249, imageUrl: 'https://source.unsplash.com/400x400/?airpods,pro' },
-    { name: 'Lego Star Wars Set', category: 'Toys', price: 80, imageUrl: 'https://source.unsplash.com/400x400/?lego,star-wars' },
-    { name: 'Estée Lauder Advanced Night Repair', category: 'Skincare', price: 105, imageUrl: 'https://source.unsplash.com/400x400/?estee-lauder,skincare' },
-    { name: 'Tag Heuer Carrera Watch', category: 'Watches', price: 4500, imageUrl: 'https://source.unsplash.com/400x400/?tag-heuer,watch' },
+    { name: 'Chanel No. 5 Perfume', category: 'Fragrance', price: 125, imageUrl: 'https://placehold.co/400x400/1F2937/FFFFFF?text=Chanel+No.5' },
+    { name: 'Lindt Swiss Chocolates Box', category: 'Confectionery', price: 25, imageUrl: 'https://placehold.co/400x400/1F2937/FFFFFF?text=Lindt+Chocolates' },
+    { name: 'Ray-Ban Aviator Sunglasses', category: 'Accessories', price: 150, imageUrl: 'https://placehold.co/400x400/1F2937/FFFFFF?text=Ray-Ban' },
+    { name: 'Johnnie Walker Blue Label', category: 'Spirits', price: 220, imageUrl: 'https://placehold.co/400x400/1F2937/FFFFFF?text=Johnnie+Walker' },
+    { name: 'Apple AirPods Pro', category: 'Electronics', price: 249, imageUrl: 'https://placehold.co/400x400/1F2937/FFFFFF?text=AirPods+Pro' },
+    { name: 'Lego Star Wars Set', category: 'Toys', price: 80, imageUrl: 'https://placehold.co/400x400/1F2937/FFFFFF?text=Lego+Star+Wars' },
+    { name: 'Estée Lauder Advanced Night Repair', category: 'Skincare', price: 105, imageUrl: 'https://placehold.co/400x400/1F2937/FFFFFF?text=Estée+Lauder' },
+    { name: 'Tag Heuer Carrera Watch', category: 'Watches', price: 4500, imageUrl: 'https://placehold.co/400x400/1F2937/FFFFFF?text=Tag+Heuer' },
 ];
 
 export const MOCK_CONTACT_EVENTS: ContactEvent[] = [
